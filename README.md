@@ -14,23 +14,23 @@ climb the tower of Lot and discover what's at the top.
 
 ## Installing ##
 
-$ rvm use 2.1.2
-$ gem install bundler
-$ bundle install
+  $ rvm use 2.1.2
+  $ gem install bundler
+  $ bundle install
 
 You must also run a migration to initialize the database.
 
 ## Migrations ##
 
-$ sequel -m db/migrations sqlite://db/lol.db
+  $ sequel -m db/migrations sqlite://db/lol.db
 
 ## Tests ##
 
-$ rake
+  $ rake
 
 ## Running ##
 
-$ ./lol.rb
+  $ ./lol.rb
 
 ## License ##
 
