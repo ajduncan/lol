@@ -9,13 +9,12 @@ require "./lib/models/link_property"
 require "./lib/command"
 
 
-# Public: Model for working with links, which reference items.
+# Public: Model for working with agents.
 #
 # Examples
 #
-#   item1 = Item.new(name => 'room1', description => 'a room')
-#   item2 = Item.new(name => 'room2', description => 'another room')
-#   link = Link.new(src_item => item1, dst_item => item2, name => 'a link from item1 to item2')
+#   room = Item.new(name => 'a room', description => 'a room')
+#   player = Agent.new(name => 'player1', description => 'a player', item => room)
 #
 class Agent < Sequel::Model
   plugin :validation_helpers
