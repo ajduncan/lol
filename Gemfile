@@ -7,5 +7,7 @@ gem 'sequel'
 gem 'sqlite3'
 
 group :test do
+  gem 'factory_girl'
+  gem 'fuubar'
   gem 'rspec'
 end

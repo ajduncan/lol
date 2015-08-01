@@ -1,17 +1,27 @@
 #!/usr/bin/env ruby
 # coding: UTF-8
 
-require './lol/models/agent'
+require './lib/models/agent'
+require "./lib/models/item"
+require "./lib/models/item_property"
+require "./lib/models/link"
+require "./lib/models/link_property"
+require "./lib/command"
 
 
 class LOL
   def initialize
-    @agent = Agent.new
+    if Item.count == 0
+      puts "Run the DB setup/migration utility!"
+    end
+
+    @agent = Agent.first
   end
 
   def run
+    @agent.look
     while true
-      @agent.run_command
+      @agent.repl
     end
   end
 end

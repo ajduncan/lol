@@ -4,44 +4,32 @@ require 'colorize'
 require 'sequel'
 DB = Sequel.connect('sqlite://db/lol.db')
 
-require "./lol/models/item"
-require "./lol/models/item_property"
-require "./lol/models/link"
-require "./lol/models/link_property"
-require "./lol/command"
+require "./lib/models/item"
+require "./lib/models/item_property"
+require "./lib/models/link"
+require "./lib/models/link_property"
+require "./lib/command"
 
 
 class Agent < Sequel::Model
   plugin :validation_helpers
-  one_to_one :item
+  many_to_one :item
 
   def validate
     super
     validates_presence [:name, :item]
   end
 
-  def initialize
-    if Item.count == 0
-      puts "Run the DB setup/migration utility!"
-    end
-    # for now, just put the agent in the first room
-    @command = Command.new
-    @location = Item.first
-    @exits = Link.where(:src_item_id => @location.id)
-    look
-  end
-
-  def exits
-    print "Exits: "
-    print @exits.map{|e| "#{e.name}".blue }.join(', ')
-    puts ""
+  def initialize(location = 1)
+    @location = Item.where(:id => location)
+    @exits = Link.where(:src_item => @location)
   end
 
   def look(what = '')
     case what.downcase
     when '', 'here'
-      puts @location.description
-      exits
+      puts self.item.description
+      Link.print_exits(self.item)
     when 'm', 'me', 's', 'self'
       puts (@description || "Nothing special.")
     else
@@ -50,13 +38,15 @@ class Agent < Sequel::Model
   end
 
   def move(direction)
-    link = Link.where(:src_item_id => @location.id, Sequel.function(:lower, :name) => direction.downcase).first
-    @location = Item.where(:id => link.dst_item_id).first
-    @exits = Link.where(:src_item_id => @location.id)
+    link = Link.where(:src_item_id => self.item.id, Sequel.function(:lower, :name) => direction.downcase).first
+    self.item = Item.where(:id => link.dst_item_id).first
+    @exits = Link.where(:src_item_id => self.item.id)
     look
   end
 
-  def run_command
+  def repl
+    @command = Command.new unless !@command.nil?
+    @exits = Link.where(:src_item_id => self.item.id) unless !@exits.nil?
     print "$ "
     @command.get_command
 
@@ -77,7 +67,7 @@ class Agent < Sequel::Model
     when *@exits.collect{|e| e.name.downcase }
       move(@command.head.to_s)
     else
-      puts "Unknown command: '#{@command.head}'"
+      puts "Unknown command: '#{@command.last.to_s}'"
     end
   end
 end

@@ -2,7 +2,7 @@ Sequel.migration do
   up do
     create_table(:agents) do
       primary_key :id
-      foreign_key :location_id, :items
+      foreign_key :item_id, :items
       String :name, :null=>false
       String :description, :text=>true
     end
@@ -40,13 +40,15 @@ Sequel.migration do
     src = self[:items].insert(:name => 'A dark cave', :description => 'A dark cave at the edge of a desert')
     dst = self[:items].insert(:name => 'Entrance to a dark cave',
     :description => 'The foot of an outcropping of rocks concealing a cave at the edge of a desert.')
+
     self[:links].insert(:src_item_id => src, :dst_item_id => dst, :name => "Outside")
     self[:links].insert(:src_item_id => dst, :dst_item_id => src, :name => "Cave")
+
     dst = self[:items].insert(:name => 'Deep inside a dark cave', :description => 'Barely any light fills the space deep within the earth.')
     self[:links].insert(:src_item_id => src, :dst_item_id => dst, :name => "Further Inside")
     self[:links].insert(:src_item_id => dst, :dst_item_id => src, :name => "A faint light")
 
-    player = self[:agents].insert(:name => 'player', :description => 'A wandering stranger in a strange place.', :location_id => src)
+    player = self[:agents].insert(:name => 'player', :description => 'A wandering stranger in a strange place.', :item_id => src)
 
   end
 
