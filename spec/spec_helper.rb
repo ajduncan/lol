@@ -3,11 +3,11 @@ require 'rspec'
 require 'sequel'
 DB = Sequel.connect('sqlite://db/lol.db')
 
-require './lol/models/item'
-require './lol/models/item_property'
-require './lol/models/link'
-require './lol/models/link_property'
-require './lol/models/agent'
+require './lib/models/item'
+require './lib/models/item_property'
+require './lib/models/link'
+require './lib/models/link_property'
+require './lib/models/agent'
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
