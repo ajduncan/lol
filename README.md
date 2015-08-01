@@ -14,9 +14,9 @@ climb the tower of Lot and discover what's at the top.
 
 ## Installing ##
 
-  $ rvm use 2.1.2
-  $ gem install bundler
-  $ bundle install
+    $ rvm use 2.1.2
+    $ gem install bundler
+    $ bundle install
 
 You must also run a migration to initialize the database.
 
