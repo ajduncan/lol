@@ -1,7 +1,9 @@
 require 'factory_girl'
 require 'rspec'
 require 'sequel'
-DB = Sequel.connect('sqlite://db/lol.db')
+
+Sequel::Model.plugin(:schema)
+DB = Sequel.sqlite
 
 require './lib/models/item'
 require './lib/models/item_property'

@@ -9,9 +9,23 @@ require "./lib/models/link_property"
 require "./lib/command"
 
 
+# Public: Model for working with links, which reference items.
+#
+# Examples
+#
+#   item1 = Item.new(name => 'room1', description => 'a room')
+#   item2 = Item.new(name => 'room2', description => 'another room')
+#   link = Link.new(src_item => item1, dst_item => item2, name => 'a link from item1 to item2')
+#
 class Agent < Sequel::Model
   plugin :validation_helpers
   many_to_one :item
+  set_schema do
+    primary_key :id
+    foreign_key :item_id, :items
+    string :name, :null=>false
+    string :description, :text=>true
+  end
 
   def validate
     super
@@ -22,7 +36,7 @@ class Agent < Sequel::Model
     case what.downcase
     when '', 'here'
       puts self.item.description
-      Link.print_exits(self.item)
+      self.item.print_exits
     when 'm', 'me', 's', 'self'
       puts (self.description || "Nothing special.")
     else
@@ -32,14 +46,18 @@ class Agent < Sequel::Model
 
   def move(direction)
     link = Link.where(:src_item_id => self.item.id, Sequel.function(:lower, :name) => direction.downcase).first
-    self.item = Item.where(:id => link.dst_item_id).first
-    @exits = Link.where(:src_item_id => self.item.id)
-    look
+    if !link.nil?
+      self.item = Item.where(:id => link.dst_item_id).first
+      @exits = Link.where(:src_item_id => self.item.id)
+      return true
+    else
+      return false
+    end
   end
 
   def repl
     @command = Command.new unless !@command.nil?
-    @exits = Link.where(:src_item_id => self.item.id) unless !@exits.nil?
+    @exits = self.item.exits unless !@exits.nil? # Link.where(:src_item_id => self.item.id) unless !@exits.nil?
     print "$ "
     @command.get_command
 
@@ -47,6 +65,7 @@ class Agent < Sequel::Model
     case @command.last.to_s.downcase
     when *@exits.collect{|e| e.name.downcase }
       move(@command.last.to_s)
+      look
       return
     end
 
@@ -64,3 +83,5 @@ class Agent < Sequel::Model
     end
   end
 end
+
+Agent.create_table unless Agent.table_exists?

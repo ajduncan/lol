@@ -2,6 +2,7 @@
 # coding: UTF-8
 
 require 'sequel'
+Sequel::Model.plugin(:schema)
 DB = Sequel.connect('sqlite://db/lol.db')
 
 require './lib/models/agent'
