@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # coding: UTF-8
 
+require 'sequel'
+DB = Sequel.connect('sqlite://db/lol.db')
+
 require './lib/models/agent'
 require "./lib/models/item"
 require "./lib/models/item_property"
