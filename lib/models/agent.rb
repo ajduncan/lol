@@ -18,11 +18,6 @@ class Agent < Sequel::Model
     validates_presence [:name, :item]
   end
 
-  def initialize(location = 1)
-    @location = Item.where(:id => location)
-    @exits = Link.where(:src_item => @location)
-  end
-
   def look(what = '')
     case what.downcase
     when '', 'here'

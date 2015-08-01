@@ -10,6 +10,6 @@ FactoryGirl.define do
   factory :agent do
     name "player"
     description "a player"
-    location_id item
+    item
   end
 end
