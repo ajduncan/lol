@@ -24,7 +24,7 @@ class Agent < Sequel::Model
       puts self.item.description
       Link.print_exits(self.item)
     when 'm', 'me', 's', 'self'
-      puts (@description || "Nothing special.")
+      puts (self.description || "Nothing special.")
     else
       puts "That isn't here to look at."
     end
