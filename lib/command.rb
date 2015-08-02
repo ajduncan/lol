@@ -8,6 +8,7 @@ class Command
   end
 
   attr_reader :last, :tokens, :head, :params
+  attr_writer :last
 
   def parse_command
     @tokens = @last.split(' ')
@@ -16,6 +17,7 @@ class Command
   end
 
   def get_command
+    put "$ "
     @last = $stdin.gets.chomp
     parse_command
   end

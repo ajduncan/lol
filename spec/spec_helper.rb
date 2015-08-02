@@ -1,15 +1,16 @@
-require 'factory_girl'
-require 'rspec'
-require 'sequel'
+require "factory_girl"
+require "rspec"
+require "sequel"
+require "socket"
 
 Sequel::Model.plugin(:schema)
 DB = Sequel.sqlite
 
-require './lib/models/item'
-require './lib/models/item_property'
-require './lib/models/link'
-require './lib/models/link_property'
-require './lib/models/agent'
+require "./lib/models/item"
+require "./lib/models/item_property"
+require "./lib/models/link"
+require "./lib/models/link_property"
+require "./lib/models/agent"
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods

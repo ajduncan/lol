@@ -5,6 +5,11 @@ describe Agent do
   let(:link) { create(:link) }
   let(:agent) { build(:agent, :item => item) }
 
+  before do
+    # not sure what the convention here is or if i should just mock
+    agent.connection = $stdout
+  end
+
   it "has a name" do
     expect(agent.name).to eq('player')
   end

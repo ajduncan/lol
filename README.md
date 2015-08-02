@@ -22,15 +22,27 @@ You must also run a migration to initialize the database.
 
 ## Migrations ##
 
-  $ sequel -m db/migrations sqlite://db/lol.db
+    $ sequel -m db/migrations sqlite://db/lol.db
 
 ## Tests ##
 
-  $ rake
+    $ rake
+
+## ssl ##
+
+To generate a self-signed private certificate to use an encrypted server;
+
+    $ openssl genrsa -out data/example_private.pem 1024
+    $ openssl req -new -key data/example_private.pem -out data/example_request.csr
+    $ openssl x509 -req -days 9999 -in data/example_request.csr -signkey data/example_private.pem -out data/example_signed_certifcate.pem
 
 ## Running ##
 
-  $ ./lol.rb
+Start the server:
+
+    $ ./lol.rb
+
+Use the provided client, which will connect to localhost:9000 using ssl.
 
 ## License ##
 

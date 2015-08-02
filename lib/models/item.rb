@@ -42,7 +42,7 @@ class Item < Sequel::Model
     return Link.where(:src_item_id => id)
   end
 
-  # Public: instance method which prints the name of all exits.
+  # Public: instance method which returns a string of all exits.
   #
   # Examples
   #
@@ -55,11 +55,11 @@ class Item < Sequel::Model
   #
   #   # print exits, bar and baz
   #   foo.print_exits
-  def print_exits
+  #
+  # Returns the associated exits of the item as a string with colors
+  def collect_exits
     exits = Link.where(:src_item_id => id)
-    print "Exits: "
-    print exits.map{|e| "#{e.name}".blue }.join(', ')
-    puts ""
+    return exits.map{|e| "#{e.name}".blue }.join(', ')
   end
 
 end

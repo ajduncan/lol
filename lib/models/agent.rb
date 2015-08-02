@@ -26,6 +26,9 @@ class Agent < Sequel::Model
     string :description, :text=>true
   end
 
+  attr_reader :connection
+  attr_writer :connection
+
   def validate
     super
     validates_presence [:name, :item]
@@ -34,12 +37,12 @@ class Agent < Sequel::Model
   def look(what = '')
     case what.downcase
     when '', 'here'
-      puts self.item.description
-      self.item.print_exits
+      connection.puts self.item.description
+      connection.puts self.item.collect_exits
     when 'm', 'me', 's', 'self'
-      puts (self.description || "Nothing special.")
+      connection.puts (self.description || "Nothing special.")
     else
-      puts "That isn't here to look at."
+      connection.puts "That isn't here to look at."
     end
   end
 
@@ -54,11 +57,11 @@ class Agent < Sequel::Model
     end
   end
 
-  def repl
+  def repl(text)
     @command = Command.new unless !@command.nil?
-    @exits = self.item.exits unless !@exits.nil? # Link.where(:src_item_id => self.item.id) unless !@exits.nil?
-    print "$ "
-    @command.get_command
+    @command.last = text
+    @command.parse_command
+    @exits = self.item.exits unless !@exits.nil?
 
     # check exits, triggers, etc
     case @command.last.to_s.downcase
@@ -72,13 +75,13 @@ class Agent < Sequel::Model
     when 'l', 'look'
       look(@command.params)
     when 'q', 'quit'
-      puts "Quitting."
-      exit(1)
+      connection.puts "Quitting."
+      connection.close
     # todo handle spaced exits, go and goto
     when *@exits.collect{|e| e.name.downcase }
       move(@command.head.to_s)
     else
-      puts "Unknown command: '#{@command.last.to_s}'"
+      connection.puts "Unknown command: '#{@command.last.to_s}'"
     end
   end
 end
