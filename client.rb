@@ -1,47 +1,64 @@
 #!/usr/bin/env ruby
+# coding: UTF-8
 
-require "openssl"
-require "socket"
-require "thread"
+require "rubygems"
+require "eventmachine"
 
-HOST = 'localhost'
-PORT = 9000
+HOST = '127.0.0.1'
+SSL_PORT = 9001
 
-class LOLClient
-  def initialize
-    @socket = TCPSocket.new(HOST, PORT)
-    @check_cert = OpenSSL::X509::Certificate.new(File.open("data/example_signed_certificate.pem"))
-    @ssl = OpenSSL::SSL::SSLSocket.new(@socket)
-    @ssl.sync_close = true
+
+class LOLKeyboardHandler < EM::Connection
+  include EM::Protocols::LineText2
+
+  attr_reader :queue
+
+  def initialize(q)
+    @queue = q
   end
 
-  def connect
-    @ssl.connect
-    if @ssl.peer_cert.to_s != @check_cert.to_s
-      stderrr.puts "Unexpected certificate"
-      exit(1)
-    end
-  end
-
-  def run
-    Thread.new {
-      begin
-        while text = @ssl.gets
-          text = text.chomp
-          $stdout.puts text
-        end
-      rescue
-        $stderr.puts "Error: " + $!
-      end
-    }
-
-    # afaik here detecting closed is more a recv returns "" or ECONNRESET than closed.
-    @ssl.puts $stdin.gets.chomp until @socket.closed?
+  def receive_line(data)
+    @queue.push(data)
   end
 end
 
+
+class LOLClientSSLHandler < EM::Connection
+  attr_reader :queue
+
+  def initialize(q)
+    @queue = q
+
+    cb = Proc.new do |msg|
+      send_data(msg)
+      q.pop &cb
+    end
+
+    q.pop &cb
+  end
+
+  def connection_completed
+    start_tls
+  end
+
+  def receive_data(data)
+    puts data
+  end
+
+  def ssl_handshake_completed
+    puts "SSL handshake completed successfully."
+  end
+
+  def unbinding
+    puts "Disconnecting..."
+  end
+
+end
+
 if __FILE__ == $0
-  lolc = LOLClient.new
-  lolc.connect
-  lolc.run
+  EM.run {
+    q = EM::Queue.new
+    EM.connect(HOST, SSL_PORT, LOLClientSSLHandler, q)
+    EM.open_keyboard(LOLKeyboardHandler, q)
+  }
 end

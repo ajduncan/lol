@@ -18,6 +18,7 @@ GEM
     builder (3.2.2)
     colorize (0.7.7)
     diff-lcs (1.2.5)
+    eventmachine (1.0.4)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
     fuubar (2.0.0)
@@ -53,6 +54,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   colorize
+  eventmachine
   factory_girl
   fuubar
   pg

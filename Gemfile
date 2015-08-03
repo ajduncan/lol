@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'activerecord'
+gem 'eventmachine'
 gem 'colorize'
 gem 'pg'
 gem 'sequel'

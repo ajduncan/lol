@@ -26,8 +26,7 @@ class Agent < Sequel::Model
     string :description, :text=>true
   end
 
-  attr_reader :connection
-  attr_writer :connection
+  attr_accessor :connection
 
   def validate
     super
@@ -37,12 +36,12 @@ class Agent < Sequel::Model
   def look(what = '')
     case what.downcase
     when '', 'here'
-      connection.puts self.item.description
-      connection.puts self.item.collect_exits
+      connection.send_data(self.item.description + "\n")
+      connection.send_data(self.item.collect_exits + "\n")
     when 'm', 'me', 's', 'self'
-      connection.puts (self.description || "Nothing special.")
+      connection.send_data( (self.description || "Nothing special.") + "\n" )
     else
-      connection.puts "That isn't here to look at."
+      connection.send_data("That isn't here to look at.\n")
     end
   end
 
@@ -75,13 +74,13 @@ class Agent < Sequel::Model
     when 'l', 'look'
       look(@command.params)
     when 'q', 'quit'
-      connection.puts "Quitting."
-      connection.close
+      connection.send_data("Quitting.\n")
+      connection.close_connection_after_writing
     # todo handle spaced exits, go and goto
     when *@exits.collect{|e| e.name.downcase }
       move(@command.head.to_s)
     else
-      connection.puts "Unknown command: '#{@command.last.to_s}'"
+      connection.send_data("Unknown command: '#{@command.last.to_s}'\n")
     end
   end
 end
