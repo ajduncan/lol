@@ -42,7 +42,9 @@ Start the server:
 
     $ ./lol.rb
 
-Use the provided client, which will connect to localhost:9000 using ssl.
+Use the provided client, which will connect to localhost:9001 using ssl.
+
+    $ ./client.rb
 
 ## License ##
 
