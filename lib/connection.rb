@@ -17,6 +17,7 @@ class Connection < EventMachine::Connection
 
   def post_init
     start_tls(:private_key_file => './data/example_private.pem', :cert_chain_file => 'data/example_signed_certificate.pem', :verify_peer => false)
+    send_data(MOTD)
   end
 
   def receive_data(data)

@@ -8,6 +8,9 @@ Sequel::Model.plugin(:schema)
 DB = Sequel.connect('sqlite://db/lol.db')
 PORT = 9000
 SSL_PORT = 9001
+MOTD_FILE = File.open("./data/motd.txt")
+MOTD = MOTD_FILE.read
+MOTD_FILE.close
 
 require "./lib/connection"
 
