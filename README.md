@@ -1,5 +1,7 @@
 # Legend of Lod #
 
+[![Build Status](https://travis-ci.org/ajduncan/lol.svg)](https://travis-ci.org/ajduncan/lol)
+
 A text adventure mu* styled game, entirely for educational purposes.
 
 At the center of the world a tower to the sky extends over
