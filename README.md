@@ -46,6 +46,10 @@ Use the provided client, which will connect to localhost:9001 using ssl.
 
     $ ./client.rb
 
+Authenticate using:
+
+connect player1 foobarbaz
+
 ## License ##
 
 MIT

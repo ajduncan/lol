@@ -55,6 +55,7 @@ class LOLClientSSLHandler < EM::Connection
 
 end
 
+
 if __FILE__ == $0
   EM.run {
     q = EM::Queue.new

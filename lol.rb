@@ -13,7 +13,7 @@ MOTD = MOTD_FILE.read
 MOTD_FILE.close
 
 require "./lib/connection"
-
+require "./lib/models/world"
 
 class LOL
   attr_accessor :connections
@@ -23,10 +23,19 @@ class LOL
   end
 
   def start
-    puts "SSL server listening on port #{SSL_PORT}"
     @ssl_server = EventMachine.start_server("127.0.0.1", SSL_PORT, Connection) do |connection|
       connection.server = self
     end
+    puts "SSL server listening on port #{SSL_PORT}"
+
+    @world_server = EM.add_periodic_timer(5) {
+      events = World.events
+      @connections.each { |connection|
+        connection.send_data("#{events}\n")
+      }
+    }
+    puts "World server started"
+
   end
 
   def stop
@@ -48,6 +57,7 @@ class LOL
   end
 
 end
+
 
 if __FILE__ == $0
   EM.run {

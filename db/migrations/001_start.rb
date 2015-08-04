@@ -3,7 +3,8 @@ Sequel.migration do
     create_table(:agents) do
       primary_key :id
       foreign_key :item_id, :items
-      String :name, :null=>false
+      String :name, :null=>false, :unique=>true
+      String :password, :null=>false
       String :description, :text=>true
     end
 
@@ -48,7 +49,10 @@ Sequel.migration do
     self[:links].insert(:src_item_id => src, :dst_item_id => dst, :name => "Further Inside")
     self[:links].insert(:src_item_id => dst, :dst_item_id => src, :name => "A faint light")
 
-    player = self[:agents].insert(:name => 'player', :description => 'A wandering stranger in a strange place.', :item_id => src)
+    pass1 = "$2a$10$pU49JMTH/4eo.3dJ.yTQI.ir2aFNn4aYQMi.bVtGFqyo8EaeI62uS" # foobarbaz
+    pass2 = "$2a$10$NEaEq/PPEDCqKFFUlILjEegjVw9eeljZ2Go3WT.bHpW9JIPeFsAc2" # bazbarfoo
+    player1 = self[:agents].insert(:name => 'player1', :password => pass1, :description => 'A wandering stranger in a strange place.', :item_id => src)
+    player2 = self[:agents].insert(:name => 'player2', :password => pass2, :description => 'A wandering stranger in a strange place.', :item_id => src)
 
   end
 
