@@ -10,5 +10,6 @@ gem 'sqlite3'
 group :test do
   gem 'factory_girl'
   gem 'fuubar'
+  gem 'rake'
   gem 'rspec'
 end
