@@ -38,6 +38,13 @@ class Agent < Sequel::Model
     when '', 'here'
       connection.send_data(self.item.description + "\n")
       connection.send_data(self.item.collect_exits + "\n")
+      agents = []
+      agents_here.each { |ac|
+        agents.push(ac.agent.name) unless ac.agent.name == name
+      }
+      if agents.count > 0
+        connection.send_data('Players: ' + agents.join(' ') + "\n")
+      end
     when 'm', 'me', 's', 'self'
       connection.send_data( (self.description || "Nothing special.") + "\n" )
     else
