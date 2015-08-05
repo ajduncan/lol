@@ -71,7 +71,6 @@ class Agent < Sequel::Model
       end
     }
     return list
-
   end
 
   def repl(text)
@@ -99,6 +98,20 @@ class Agent < Sequel::Model
       connection.send_data('You say, "' + msg + '"')
       agents_here.each { |ac|
         ac.send_data(name + ' says, "' + msg + '"') unless ac.agent.name == name
+      }
+    when /^:/, 'pose'
+      if @command.last[0] == ':'
+        if @command.last[1] == "'"
+          @command.last[0] = ''
+        else
+          @command.last[0] = ' '
+        end
+        msg = @command.last
+      else
+        msg = @command.params
+      end
+      agents_here.each { |ac|
+        ac.send_data(name + msg)
       }
     when 'l', 'look'
       look(@command.params)
