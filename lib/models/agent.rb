@@ -95,9 +95,9 @@ class Agent < Sequel::Model
       else
         msg = @command.params
       end
-      connection.send_data('You say, "' + msg + '"')
+      connection.send_data('You say, "' + msg + "\"\n")
       agents_here.each { |ac|
-        ac.send_data(name + ' says, "' + msg + '"') unless ac.agent.name == name
+        ac.send_data(name + ' says, "' + msg + "\"\n") unless ac.agent.name == name
       }
     when /^:/, 'pose'
       if @command.last[0] == ':'
@@ -111,7 +111,7 @@ class Agent < Sequel::Model
         msg = @command.params
       end
       agents_here.each { |ac|
-        ac.send_data(name + msg)
+        ac.send_data(name + msg + "\n")
       }
     when 'l', 'look'
       look(@command.params)
@@ -123,7 +123,7 @@ class Agent < Sequel::Model
       @connection.server.connections.each { |connection|
         list.push(connection.agent.name)
       }
-      connection.send_data("Online now: " + list.join(' '))
+      connection.send_data("Online now: " + list.join(' ') + "\n")
     # todo handle spaced exits, go and goto
     when *@exits.collect{|e| e.name.downcase }
       move(@command.head.to_s)
