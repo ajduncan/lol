@@ -28,7 +28,7 @@ class LOL
     end
     puts "SSL server listening on port #{SSL_PORT}"
 
-    @world_server = EM.add_periodic_timer(5) {
+    @world_server = EM.add_periodic_timer(120) {
       events = World.events
       @connections.each { |connection|
         connection.send_data("#{events}\n")

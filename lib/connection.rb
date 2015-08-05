@@ -34,9 +34,10 @@ class Connection < EventMachine::Connection
 
   def unbind
     puts "Client disconnecting..."
+    name = @agent.name
     @server.connections.each { |connection|
-      puts "Letting client know #{@agent.name} disconnected."
-      connection.send_data("#{@agent.name} disconnected.\n")
+      puts "Letting client know #{name} disconnected."
+      connection.send_data("#{name} disconnected.\n")
     }
     @server.connections.delete(self)
   end
@@ -49,6 +50,7 @@ class Connection < EventMachine::Connection
     return false unless BCrypt::Password.new(agent.password) == password
     @agent = agent
     @agent.connection = self
+    # update this with a notify
     @server.connections.each { |connection| connection.send_data("#{@agent.name} has connected.\n") }
     @server.connections << self
     @agent.repl('l')
@@ -71,13 +73,18 @@ class Connection < EventMachine::Connection
           send_data("Unknown user or incorrect password.\n")
         end
       end
+    when 'who'
+      list = []
+      @server.connections.each { |connection|
+        list.push(connection.agent.name)
+      }
+      send_data("Online now: " + list.join(' '))
     when 'q', 'quit'
       send_data("Quitting.\n")
       close_connection_after_writing
     else
       send_data("Unknown command: '#{data}'\n")
     end
-
   end
 
   def handle_command(message)

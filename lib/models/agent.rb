@@ -56,6 +56,17 @@ class Agent < Sequel::Model
     end
   end
 
+  def agents_here
+    list = []
+    @connection.server.connections.each { |connection|
+      if connection.agent.item == item
+        list.push(connection)
+      end
+    }
+    return list
+
+  end
+
   def repl(text)
     @command = Command.new unless !@command.nil?
     @command.last = text
@@ -71,11 +82,28 @@ class Agent < Sequel::Model
     end
 
     case @command.head.to_s.downcase
+    when /^"/, 'say'
+      if @command.last[0] == '"'
+        @command.last[0] = ''
+        msg = @command.last
+      else
+        msg = @command.params
+      end
+      connection.send_data('You say, "' + msg + '"')
+      agents_here.each { |ac|
+        ac.send_data(name + ' says, "' + msg + '"') unless ac.agent.name == name
+      }
     when 'l', 'look'
       look(@command.params)
     when 'q', 'quit'
       connection.send_data("Quitting.\n")
       connection.close_connection_after_writing
+    when 'who'
+      list = []
+      @connection.server.connections.each { |connection|
+        list.push(connection.agent.name)
+      }
+      connection.send_data("Online now: " + list.join(' '))
     # todo handle spaced exits, go and goto
     when *@exits.collect{|e| e.name.downcase }
       move(@command.head.to_s)
