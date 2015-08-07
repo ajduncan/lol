@@ -3,16 +3,13 @@
 require "bcrypt"
 
 require "./lib/models/agent"
-require "./lib/models/item"
-require "./lib/models/item_property"
-require "./lib/models/link"
-require "./lib/models/link_property"
 require "./lib/command"
 
 
 class Connection < EventMachine::Connection
   attr_accessor :server
   attr_reader :agent
+  attr_reader :command
 
   def initialize
   end
@@ -33,12 +30,12 @@ class Connection < EventMachine::Connection
   end
 
   def unbind
-    puts "Client disconnecting..."
-    name = @agent.name
-    @server.connections.each { |connection|
-      puts "Letting client know #{name} disconnected."
-      connection.send_data("#{name} disconnected.\n")
-    }
+    #puts "Client disconnecting..."
+    #name = @agent.name
+    #@server.connections.each { |connection|
+    #  puts "Letting client know #{name} disconnected."
+    #  connection.send_data("#{name} disconnected.\n")
+    #}
     @server.connections.delete(self)
   end
 
@@ -48,12 +45,20 @@ class Connection < EventMachine::Connection
     return false unless username && password
     return false unless agent = Agent.first(Sequel.function(:lower, :name) => username.to_s.downcase)
     return false unless BCrypt::Password.new(agent.password) == password
+
+    # a connection has an agent, an agent has a connection
     @agent = agent
     @agent.connection = self
+
+    # a connection has commands, command has a connection and agent
+    @command = Command.new
+    @command.connection = self
+    @command.agent = agent
+
     # update this with a notify
-    @server.connections.each { |connection| connection.send_data("#{@agent.name} has connected.\n") }
+    # @server.connections.each { |connection| connection.send_data("#{@agent.name} has connected.\n") }
     @server.connections << self
-    @agent.repl('l')
+    @command.repl('l')
     return true
   end
 
@@ -88,7 +93,7 @@ class Connection < EventMachine::Connection
   end
 
   def handle_command(message)
-    @agent.repl(message)
+    @command.repl(message)
   end
 
 end

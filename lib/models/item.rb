@@ -38,7 +38,7 @@ class Item < Sequel::Model
   #   exits = foo.exits
   #
   # Returns the associated exits of the item
-  def exits
+  def get_exits
     return Link.where(:src_item_id => id)
   end
 

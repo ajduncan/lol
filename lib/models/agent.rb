@@ -26,7 +26,7 @@ class Agent < Sequel::Model
     string :description, :text=>true
   end
 
-  attr_accessor :connection
+  attr_accessor :connection, :exits
 
   def validate
     super
@@ -34,19 +34,31 @@ class Agent < Sequel::Model
   end
 
   def look(what = '')
+    agents = agents_here
+    agent_names = []
+    agents.each { |c| agent_names.push(c.agent.name.downcase) }
     case what.downcase
     when '', 'here'
       connection.send_data(self.item.description + "\n")
       connection.send_data(self.item.collect_exits + "\n")
-      agents = []
-      agents_here.each { |ac|
-        agents.push(ac.agent.name) unless ac.agent.name == name
+      other_agents = []
+      agents.each { |ac|
+        other_agents.push(ac.agent.name) unless ac.agent.name == name
       }
-      if agents.count > 0
-        connection.send_data('Players: ' + agents.join(' ') + "\n")
+      if other_agents.count > 0
+        connection.send_data('Players: ' + other_agents.join(' ') + "\n")
       end
     when 'm', 'me', 's', 'self'
       connection.send_data( (self.description || "Nothing special.") + "\n" )
+    when *agent_names
+      desc = "Nothing special."
+      agents.each { |c|
+        if c.agent.name.downcase == what.downcase
+          desc = c.agent.description
+          c.send_data(name + " looked at you.\n")
+        end
+      }
+      connection.send_data(desc + "\n")
     else
       connection.send_data("That isn't here to look at.\n")
     end
@@ -73,64 +85,6 @@ class Agent < Sequel::Model
     return list
   end
 
-  def repl(text)
-    @command = Command.new unless !@command.nil?
-    @command.last = text
-    @command.parse_command
-    @exits = self.item.exits unless !@exits.nil?
-
-    # check exits, triggers, etc
-    case @command.last.to_s.downcase
-    when *@exits.collect{|e| e.name.downcase }
-      move(@command.last.to_s)
-      look
-      return
-    end
-
-    case @command.head.to_s.downcase
-    when /^"/, 'say'
-      if @command.last[0] == '"'
-        @command.last[0] = ''
-        msg = @command.last
-      else
-        msg = @command.params
-      end
-      connection.send_data('You say, "' + msg + "\"\n")
-      agents_here.each { |ac|
-        ac.send_data(name + ' says, "' + msg + "\"\n") unless ac.agent.name == name
-      }
-    when /^:/, 'pose'
-      if @command.last[0] == ':'
-        if @command.last[1] == "'"
-          @command.last[0] = ''
-        else
-          @command.last[0] = ' '
-        end
-        msg = @command.last
-      else
-        msg = @command.params
-      end
-      agents_here.each { |ac|
-        ac.send_data(name + msg + "\n")
-      }
-    when 'l', 'look'
-      look(@command.params)
-    when 'q', 'quit'
-      connection.send_data("Quitting.\n")
-      connection.close_connection_after_writing
-    when 'who'
-      list = []
-      @connection.server.connections.each { |connection|
-        list.push(connection.agent.name)
-      }
-      connection.send_data("Online now: " + list.join(' ') + "\n")
-    # todo handle spaced exits, go and goto
-    when *@exits.collect{|e| e.name.downcase }
-      move(@command.head.to_s)
-    else
-      connection.send_data("Unknown command: '#{@command.last.to_s}'\n")
-    end
-  end
 end
 
 Agent.create_table unless Agent.table_exists?
