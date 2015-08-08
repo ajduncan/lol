@@ -30,12 +30,9 @@ class Connection < EventMachine::Connection
   end
 
   def unbind
-    #puts "Client disconnecting..."
-    #name = @agent.name
-    #@server.connections.each { |connection|
-    #  puts "Letting client know #{name} disconnected."
-    #  connection.send_data("#{name} disconnected.\n")
-    #}
+    @agent.connections_here.each { |ac|
+      ac.send_data(@agent.name + " disconnected.\n") unless ac.agent.name == @agent.name
+    }
     @server.connections.delete(self)
   end
 
@@ -55,9 +52,8 @@ class Connection < EventMachine::Connection
     @command.connection = self
     @command.agent = agent
 
-    # update this with a notify
-    agent.connections_here.each { |ac|
-      ac.send_data(agent.name + " connected.\n") unless ac.agent.name == agent.name
+    @agent.connections_here.each { |ac|
+      ac.send_data(@agent.name + " connected.\n") unless ac.agent.name == @agent.name
     }
     @server.connections[agent.name.downcase] = self
     @command.repl('l')
