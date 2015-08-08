@@ -8,7 +8,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     bcrypt (3.1.7)
-    colorize (0.7.7)
     diff-lcs (1.2.5)
     eventmachine (1.0.4)
     factory_girl (4.5.0)
@@ -20,6 +19,7 @@ GEM
     json (1.8.3)
     minitest (5.7.0)
     pg (0.18.2)
+    rainbow (2.0.0)
     rake (10.4.2)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
@@ -46,11 +46,11 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt
-  colorize
   eventmachine
   factory_girl
   fuubar
   pg
+  rainbow
   rake
   rspec
   sequel

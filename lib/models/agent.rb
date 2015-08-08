@@ -1,12 +1,13 @@
 # coding: UTF-8
 
-require 'colorize'
+require "rainbow/ext/string"
 
+require "./lib/command"
+require "./lib/message"
 require "./lib/models/item"
 require "./lib/models/item_property"
 require "./lib/models/link"
 require "./lib/models/link_property"
-require "./lib/command"
 
 
 # Public: Model for working with agents.
@@ -33,34 +34,38 @@ class Agent < Sequel::Model
     validates_presence [:name, :item]
   end
 
+  def get_neighbors
+    @neighbors = {}
+    connections_here.each { |ac|
+      @neighbors[ac.agent.name.downcase] = ac unless ac.agent.name == name
+    }
+  end
+
   def look(what = '')
-    agents = agents_here
-    agent_names = []
-    agents.each { |c| agent_names.push(c.agent.name.downcase) }
+    get_neighbors
     case what.downcase
     when '', 'here'
-      connection.send_data(self.item.description + "\n")
-      connection.send_data(self.item.collect_exits + "\n")
-      other_agents = []
-      agents.each { |ac|
-        other_agents.push(ac.agent.name) unless ac.agent.name == name
-      }
-      if other_agents.count > 0
-        connection.send_data('Players: ' + other_agents.join(' ') + "\n")
+      msg = self.item.name + " [" + self.item.collect_exits + "]\n" + self.item.description + "\n"
+      notify(self, msg)
+      if @neighbors.count > 0
+        # todo, sigh - get the collection of agent names without using them as indexes.
+        if @neighbors.count == 1
+          notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " is here.\n".color(:cyan))
+        else
+          notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " are here.\n".color(:cyan))
+        end
       end
     when 'm', 'me', 's', 'self'
-      connection.send_data( (self.description || "Nothing special.") + "\n" )
-    when *agent_names
-      desc = "Nothing special."
-      agents.each { |c|
-        if c.agent.name.downcase == what.downcase
-          desc = c.agent.description
-          c.send_data(name + " looked at you.\n")
-        end
-      }
-      connection.send_data(desc + "\n")
+      notify(self, (self.description || "Nothing special.") + "\n")
+    when *@neighbors.keys
+      desc = @neighbors[what].agent.description
+      @connection.server.connections[what.downcase].send_data(name + " looked at you\n")
+      notify(self, desc + "\n")
+    when name.downcase
+      notify(self, description + "\n")
     else
-      connection.send_data("That isn't here to look at.\n")
+      # whisky tango foxtrot
+      notify(self, "That isn't here to look at.\n")
     end
   end
 
@@ -75,9 +80,9 @@ class Agent < Sequel::Model
     end
   end
 
-  def agents_here
+  def connections_here
     list = []
-    @connection.server.connections.each { |connection|
+    @connection.server.connections.each { |key, connection|
       if connection.agent.item == item
         list.push(connection)
       end

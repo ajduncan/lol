@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'bcrypt'
 gem 'eventmachine'
-gem 'colorize'
+gem 'rainbow'
 gem 'pg'
 gem 'sequel'
 gem 'sqlite3'

@@ -15,11 +15,12 @@ MOTD_FILE.close
 require "./lib/connection"
 require "./lib/models/world"
 
+
 class LOL
   attr_accessor :connections
 
   def initialize
-    @connections = []
+    @connections = {}
   end
 
   def start
@@ -30,7 +31,7 @@ class LOL
 
     @world_server = EM.add_periodic_timer(120) {
       events = World.events
-      @connections.each { |connection|
+      @connections.each { |key, connection|
         connection.send_data("#{events}\n")
       }
     }

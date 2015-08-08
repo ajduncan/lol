@@ -26,7 +26,14 @@ class Command
     # check exits, triggers, etc
     case @last.to_s.downcase
     when *agent.exits.collect{|e| e.name.downcase }
+      agent.connections_here.each { |ac|
+        ac.send_data(agent.name + " leaves through the \"#{@head.to_s}\" exit.\n") unless ac.agent.name == agent.name
+      }
+      connection.send_data("You move through #{@head.to_s}\n")
       agent.move(@last.to_s)
+      agent.connections_here.each { |ac|
+        ac.send_data(agent.name + " arrives.\n") unless ac.agent.name == agent.name
+      }
       agent.look
       return
     end
@@ -40,7 +47,7 @@ class Command
         msg = @params
       end
       connection.send_data('You say, "' + msg + "\"\n")
-      agent.agents_here.each { |ac|
+      agent.connections_here.each { |ac|
         ac.send_data(agent.name + ' says, "' + msg + "\"\n") unless ac.agent.name == agent.name
       }
     when /^:/, 'pose'
@@ -54,28 +61,23 @@ class Command
       else
         msg = @params
       end
-      agent.agents_here.each { |ac|
+      agent.connections_here.each { |ac|
         ac.send_data(agent.name + msg + "\n")
       }
     when 'l', 'look'
       agent.look(@params)
     when 'q', 'quit'
       connection.send_data("Quitting.\n")
-      agent.agents_here.each { |ac|
+      agent.connections_here.each { |ac|
         ac.send_data(agent.name + " disconnected.\n") unless ac.agent.name == agent.name
       }
       connection.close_connection_after_writing
     when 'who'
       list = []
-      connection.server.connections.each { |connection|
+      connection.server.connections.each { |key, connection|
         list.push(connection.agent.name)
       }
       connection.send_data("Online now: " + list.join(' ') + "\n")
-    when *agent.exits.collect{|e| e.name.downcase }
-      agent.agents_here.each { |ac|
-        ac.send_data(agent.name + ' leaves through the "' + @head.to_s + '" exit.' + "\n") unless ac.agent.name == agent.name
-      }
-      agent.move(@head.to_s)
     else
       connection.send_data("Unknown command: '#{@last.to_s}'\n")
     end

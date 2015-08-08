@@ -1,6 +1,7 @@
 # coding: UTF-8
 
-require 'sequel'
+require "rainbow/ext/string"
+require "sequel"
 
 # Public: Model for working with items.
 #
@@ -59,7 +60,7 @@ class Item < Sequel::Model
   # Returns the associated exits of the item as a string with colors
   def collect_exits
     exits = Link.where(:src_item_id => id)
-    return exits.map{|e| "#{e.name}".blue }.join(', ')
+    return exits.map{|e| "#{e.name}".color(:blue) }.join(', ')
   end
 
 end

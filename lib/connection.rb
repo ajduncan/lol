@@ -57,7 +57,8 @@ class Connection < EventMachine::Connection
 
     # update this with a notify
     # @server.connections.each { |connection| connection.send_data("#{@agent.name} has connected.\n") }
-    @server.connections << self
+    # @server.connections << self
+    @server.connections[agent.name.downcase] = self
     @command.repl('l')
     return true
   end
@@ -80,10 +81,14 @@ class Connection < EventMachine::Connection
       end
     when 'who'
       list = []
-      @server.connections.each { |connection|
+      @server.connections.each { |key, connection|
         list.push(connection.agent.name)
       }
-      send_data("Online now: " + list.join(' '))
+      if list.count > 0
+        send_data("Online now: " + list.join(' ') + "\n")
+      else
+        send_data("No one is on right now.\n")
+      end
     when 'q', 'quit'
       send_data("Quitting.\n")
       close_connection_after_writing
