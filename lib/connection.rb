@@ -56,8 +56,9 @@ class Connection < EventMachine::Connection
     @command.agent = agent
 
     # update this with a notify
-    # @server.connections.each { |connection| connection.send_data("#{@agent.name} has connected.\n") }
-    # @server.connections << self
+    agent.connections_here.each { |ac|
+      ac.send_data(agent.name + " connected.\n") unless ac.agent.name == agent.name
+    }
     @server.connections[agent.name.downcase] = self
     @command.repl('l')
     return true
