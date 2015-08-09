@@ -27,6 +27,13 @@ class Connection < EventMachine::Connection
     else
       handle_command(data)
     end
+  rescue => e
+      puts "Exception handling client message: '#{data}':"
+      puts e
+      puts "\n################################################################################\n"
+      puts e.backtrace
+      puts "\n################################################################################\n"
+      send_data("The server errored while handling your request: #{data}.\n")
   end
 
   def unbind

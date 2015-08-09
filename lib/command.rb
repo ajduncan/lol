@@ -39,6 +39,8 @@ class Command
     end
 
     case @head.to_s.downcase
+    when 'crash'
+      raise 'Deliberate client-initiated exception.'
     when /^"/, 'say'
       if @last[0] == '"'
         @last[0] = ''

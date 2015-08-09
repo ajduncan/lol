@@ -64,5 +64,8 @@ if __FILE__ == $0
   EM.run {
     lol = LOL.new
     lol.start
+    EM.error_handler { |e|
+      puts "Unhandled error: #{e.message}"
+    }
   }
 end
