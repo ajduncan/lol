@@ -17,6 +17,18 @@ class Connection < EventMachine::Connection
   def post_init
     start_tls(:private_key_file => './data/example_private.pem', :cert_chain_file => 'data/example_signed_certificate.pem', :verify_peer => false)
     send_data(MOTD)
+    disconnect_inactive
+  end
+
+  def disconnect_inactive
+    @idle_timeout = EM.add_periodic_timer(120) {
+      seconds_idle = get_idle_time
+      if seconds_idle > 119
+        send_data("Disconnecting you for inactivity.\n")
+        @idle_timeout.cancel() # is this even needed?
+        close_connection_after_writing
+      end
+    }
   end
 
   def receive_data(data)
@@ -36,19 +48,22 @@ class Connection < EventMachine::Connection
       send_data("The server errored while handling your request: #{data}.\n")
   end
 
-  def unbind
-    @agent.connections_here.each { |ac|
-      ac.send_data(@agent.name + " disconnected.\n") unless ac.agent.name == @agent.name
-    }
-    @server.connections.delete(self)
+  def handle_logout
+    @server.connections.delete(@agent.name.downcase)
+    @agent = nil
+    send_data(MOTD)
+    disconnect_inactive
   end
 
-  private
+  def unbind
+    @server.connections.delete(self)
+  end
 
   def handle_login(username, password)
     return false unless username && password
     return false unless agent = Agent.first(Sequel.function(:lower, :name) => username.to_s.downcase)
     return false unless BCrypt::Password.new(agent.password) == password
+    @idle_timeout.cancel()
 
     # a connection has an agent, an agent has a connection
     @agent = agent

@@ -1,5 +1,7 @@
 # coding: UTF-8
 
+require "./lib/message"
+
 
 class Command
 
@@ -26,14 +28,12 @@ class Command
     # check exits, triggers, etc
     case @last.to_s.downcase
     when *agent.exits.collect{|e| e.name.downcase }
-      agent.connections_here.each { |ac|
-        ac.send_data(agent.name + " leaves through the \"#{@head.to_s}\" exit.\n") unless ac.agent.name == agent.name
-      }
+      msg = agent.name + " leaves through the \"#{@head.to_s}\" exit.\n"
+      connection_notify_except(agent.connections_here, msg, agent.name)
       connection.send_data("You move through #{@head.to_s}\n")
       agent.move(@last.to_s)
-      agent.connections_here.each { |ac|
-        ac.send_data(agent.name + " arrives.\n") unless ac.agent.name == agent.name
-      }
+      msg = agent.name + " arrives.\n"
+      connection_notify_except(agent.connections_here, msg, agent.name)
       agent.look
       return
     end
@@ -49,9 +49,8 @@ class Command
         msg = @params
       end
       connection.send_data('You say, "' + msg + "\"\n")
-      agent.connections_here.each { |ac|
-        ac.send_data(agent.name + ' says, "' + msg + "\"\n") unless ac.agent.name == agent.name
-      }
+      msg = agent.name + ' says, "' + msg + "\"\n"
+      connection_notify_except(agent.connections_here, msg, agent.name)
     when /^:/, 'pose'
       if @last[0] == ':'
         if @last[1] == "'"
@@ -63,17 +62,45 @@ class Command
       else
         msg = @params
       end
-      agent.connections_here.each { |ac|
-        ac.send_data(agent.name + msg + "\n")
-      }
+      connection_notify(agent.connections_here, msg + "\n")
     when 'l', 'look'
       agent.look(@params)
     when 'q', 'quit'
       connection.send_data("Quitting.\n")
-      agent.connections_here.each { |ac|
-        ac.send_data(agent.name + " disconnected.\n") unless ac.agent.name == agent.name
-      }
+      connection_notify_except(agent.connections_here, agent.name + " disconnected.\n", agent.name)
       connection.close_connection_after_writing
+    when 'w', 'whisper'
+      whisper = @params.split('=')
+      if whisper.count > 1
+        who = whisper[0].split(' ')
+        what = whisper[1, whisper.count].join('=').strip
+        msg = whisper_correct(agent.name, what)
+        agent.last_whisper = agent.connections_here(who)
+        agent.last_whisper.each { |c|
+          c.send_data(msg)
+        }
+        who_s = []
+        agent.last_whisper.each { |c| who_s << c.agent.name }
+        who_s = who_s.join(", ")
+        connection.send_data("You whisper to " + who_s + "\n")
+      else
+        msg = whisper_correct(agent.name, @params)
+        if agent.last_whisper != ''
+          agent.last_whisper.each { |c|
+            c.send_data(msg)
+          }
+          who_s = []
+          agent.last_whisper.each { |c| who_s << c.agent.name }
+          who_s = who_s.join(", ")
+          connection.send_data("You whisper to " + who_s + "\n")
+        else
+          connection.send_data("Invalid whisper command.")
+        end
+      end
+    when 'logout'
+      connection.send_data("Logging out.\n")
+      connection_notify_except(agent.connections_here, agent.name + " disconnected.\n", agent.name)
+      connection.handle_logout
     when 'who'
       list = []
       connection.server.connections.each { |key, connection|

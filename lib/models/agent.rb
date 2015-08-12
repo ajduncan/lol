@@ -27,7 +27,7 @@ class Agent < Sequel::Model
     string :description, :text=>true
   end
 
-  attr_accessor :connection, :exits
+  attr_accessor :connection, :exits, :last_whisper
 
   def validate
     super
@@ -46,26 +46,26 @@ class Agent < Sequel::Model
     case what.downcase
     when '', 'here'
       msg = self.item.name + " [" + self.item.collect_exits + "]\n" + self.item.description + "\n"
-      notify(self, msg)
+      agent_notify(self, msg)
       if @neighbors.count > 0
         # todo, sigh - get the collection of agent names without using them as indexes.
         if @neighbors.count == 1
-          notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " is here.\n".color(:cyan))
+          agent_notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " is here.\n".color(:cyan))
         else
-          notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " are here.\n".color(:cyan))
+          agent_notify(self, '    ' + @neighbors.keys.join(', ').color(:cyan) + " are here.\n".color(:cyan))
         end
       end
     when 'm', 'me', 's', 'self'
-      notify(self, (self.description || "Nothing special.") + "\n")
+      agent_notify(self, (self.description || "Nothing special.") + "\n")
     when *@neighbors.keys
       desc = @neighbors[what].agent.description
       @connection.server.connections[what.downcase].send_data(name + " looked at you\n")
-      notify(self, desc + "\n")
+      agent_notify(self, desc + "\n")
     when name.downcase
-      notify(self, description + "\n")
+      agent_notify(self, description + "\n")
     else
       # whisky tango foxtrot
-      notify(self, "That isn't here to look at.\n")
+      agent_notify(self, "That isn't here to look at.\n")
     end
   end
 
@@ -80,11 +80,23 @@ class Agent < Sequel::Model
     end
   end
 
-  def connections_here
+  # This may work better if we're looking at items as rooms/areas, then checking contents
+  # such that you can Agent.where(item=here).connected or something.
+  # Don't do this now as we still have sequel, which is already a problem.
+  def connections_here(whom = nil)
     list = []
+    if whom
+      whom = whom.map(&:downcase)
+    end
     @connection.server.connections.each { |key, connection|
-      if connection.agent.item == item
-        list.push(connection)
+      if whom
+        if whom.include?(connection.agent.name.downcase) and connection.agent.item == item
+          list.push(connection)
+        end
+      else
+        if connection.agent.item == item
+          list.push(connection)
+        end
       end
     }
     return list
