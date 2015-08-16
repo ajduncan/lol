@@ -1,0 +1,18 @@
+{
+  "lol": {
+    "database": {
+      "name": "lol",
+      "host": "localhost",
+      "username": "postgres",
+      "password": "foobarbaz"
+    }
+  },
+  "postgresql": {
+    "password": {
+      "postgres": "foobarbaz"
+    }
+  },
+  "apt": {
+    "compile_time_update": "true"
+  }
+}
