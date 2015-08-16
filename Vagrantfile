@@ -1,21 +1,36 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+VAGRANTFILE_API_VERSION = '2'
+Vagrant.require_version '>= 1.5.0'
+
+
 def abspath(f)
   File.expand_path("../#{f}", __FILE__)
 end
 
-Vagrant.configure("2") do |config|
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.hostname = 'lol'
+
+  # config.omnibus.chef_version = "12.3.0"
+  if Vagrant.has_plugin?("vagrant-omnibus")
+    config.omnibus.chef_version = 'latest'
+  end
+
   config.vm.box = "trusty32"
   config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
+
   config.vm.provider :virtualbox do |vb|
     vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
     vb.customize ["modifyvm", :id, "--memory", 1024]
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
+
+  # config.vm.network :private_network, type: 'dhcp'
   config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.omnibus.chef_version = "12.3.0"
+
   config.berkshelf.enabled = true
   config.vm.provision :chef_solo do |chef|
     json_file = if File.exist?(abspath("chef.json"))
@@ -29,5 +44,4 @@ Vagrant.configure("2") do |config|
       'recipe[chef-lol::default]'
     ]
   end
-
 end

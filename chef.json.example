@@ -5,7 +5,8 @@
       "host": "localhost",
       "username": "postgres",
       "password": "foobarbaz"
-    }
+    },
+    "vagrant": "true"
   },
   "postgresql": {
     "password": {
