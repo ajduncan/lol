@@ -1,3 +1,5 @@
 source "https://supermarket.chef.io"
 
-cookbook 'chef-lol', git: 'git://github.com/ajduncan/chef-lol.git'
+cookbook 'lol', git: 'git://github.com/ajduncan/chef-lol.git'
+cookbook 'rbenv', git: 'git://github.com/fnichol/chef-rbenv.git'
+cookbook 'ruby_build'

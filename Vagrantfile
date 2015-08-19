@@ -29,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # config.vm.network :private_network, type: 'dhcp'
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 9001, host: 9001
 
   config.berkshelf.enabled = true
   config.vm.provision :chef_solo do |chef|
@@ -39,9 +39,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   abspath("chef.json.example")
                 end
     chef.json = JSON.parse(IO.read(json_file))
+    chef.environments_path = 'environments'
+    chef.environment = 'development'
     chef.run_list = [
       'recipe[apt]',
-      'recipe[chef-lol::default]'
+      'recipe[ruby_build]',
+      'recipe[rbenv::vagrant]',
+      'recipe[lol::default]'
     ]
   end
 end

@@ -1,12 +1,5 @@
 {
   "lol": {
-    "database": {
-      "name": "lol",
-      "host": "localhost",
-      "username": "postgres",
-      "password": "foobarbaz"
-    },
-    "vagrant": "true"
   },
   "postgresql": {
     "password": {
@@ -15,5 +8,18 @@
   },
   "apt": {
     "compile_time_update": "true"
+  },
+  "rbenv": {
+    "user_installs": [{
+      "user": "vagrant",
+      "rubies": ["2.2.2"],
+      "global": "2.2.2",
+      "gems": {
+        "2.2.2": [
+          {"name": "bundler"},
+          {"name": "rake", "version": "10.4.2", "options": "--force" }
+        ]
+      }
+    }]
   }
 }
