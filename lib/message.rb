@@ -24,6 +24,7 @@ def connection_notify_except(connection, msg, except)
   end
 end
 
+
 def agent_notify_except(agent, msg, except)
   if agent.kind_of?(Array)
     agent.each{|a| a.connection.send_data(msg) unless a.name == except}
