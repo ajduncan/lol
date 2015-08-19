@@ -5,9 +5,11 @@ require "eventmachine"
 require "sequel"
 
 Sequel::Model.plugin(:schema)
-DB = Sequel.connect('sqlite://db/lol.db')
-PORT = 9000
-SSL_PORT = 9001
+DB_URI = ENV["DB_URI"] || 'sqlite://db/lol.db'
+HOST = ENV["HOST"] || '0.0.0.0'
+DB = Sequel.connect(DB_URI)
+PORT = ENV["PORT"] || 9000
+SSL_PORT = ENV["SSL_PORT"] || 9001
 MOTD_FILE = File.open("./data/motd.txt")
 MOTD = MOTD_FILE.read
 MOTD_FILE.close
@@ -24,10 +26,10 @@ class LOL
   end
 
   def start
-    @ssl_server = EventMachine.start_server("127.0.0.1", SSL_PORT, Connection) do |connection|
+    @ssl_server = EventMachine.start_server(HOST, SSL_PORT, Connection) do |connection|
       connection.server = self
     end
-    puts "SSL server listening on port #{SSL_PORT}"
+    puts "SSL server listening on #{HOST}:#{SSL_PORT}"
 
     @world_server = EM.add_periodic_timer(120) {
       events = World.events
