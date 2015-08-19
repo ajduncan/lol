@@ -1,13 +1,16 @@
 #!/usr/bin/env ruby
 # coding: UTF-8
 
+require "dotenv"; Dotenv.load
 require "eventmachine"
+require "em-pg-sequel"
+require "em-synchrony"
 require "sequel"
 
 Sequel::Model.plugin(:schema)
-DB_URI = ENV["DB_URI"] || 'sqlite://db/lol.db'
+DB_URL = ENV["DB_URL"] || 'sqlite://db/lol.db'
 HOST = ENV["HOST"] || '0.0.0.0'
-DB = Sequel.connect(DB_URI)
+DB = Sequel.connect(DB_URL, pool_class: :em_synchrony)
 PORT = ENV["PORT"] || 9000
 SSL_PORT = ENV["SSL_PORT"] || 9001
 MOTD_FILE = File.open("./data/motd.txt")

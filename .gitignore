@@ -5,3 +5,7 @@
 .vagrant
 /cookbooks
 Berksfile.lock
+
+# if not heroku/12factor
+.env
+

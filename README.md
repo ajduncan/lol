@@ -25,6 +25,13 @@ If you want to run and develop locally, install [Chef-DK](https://downloads.chef
 You should then be able to connect over localhost:9001.  Code changes should
 cause rerun to restart the server.
 
+If you want to tinker and have automatic code changes applied, you can also
+kill the rerun process and use the following:
+
+    $ vagrant ssh
+    $ cd /vagrant
+    $ /home/vagrant/.rbenv/versions/2.2.2/bin/rerun /home/vagrant/.rbenv/versions/2.2.2/bin/ruby /vagrant/lol.rb
+
 ## Installing ##
 
     $ rvm use 2.2.2
@@ -61,9 +68,13 @@ Start the server with defaults:
 
     $ ./lol.rb
 
-Run with some environment variables:
+You may run with environment variables such as:
 
-    $ DB_URI=postgresql://lol:foobarbaz@localhost/lol HOST=0.0.0.0 ./lol.rb
+    $ DB_URL=postgresql://lol:foobarbaz@localhost/lol HOST=0.0.0.0 ./lol.rb
+
+Or copy the .env.example file to .env and edit the environment variables there,
+depending on the security of your environment and what convention you're most
+comfortable with.
 
 Use the provided client, which will connect to localhost:9001 using ssl.
 
