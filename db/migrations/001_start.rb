@@ -1,18 +1,18 @@
 Sequel.migration do
   up do
+    create_table(:items) do
+      primary_key :id
+      Integer :type, :null=>false, :default=>0
+      String :name, :null=>false
+      String :description
+    end
+
     create_table(:agents) do
       primary_key :id
       foreign_key :item_id, :items
       String :name, :null=>false, :unique=>true
       String :password, :null=>false
       String :description, :text=>true
-    end
-
-    create_table(:items) do
-      primary_key :id
-      Integer :type, :null=>false, :default=>0
-      String :name, :null=>false
-      String :description
     end
 
     create_table(:items_properties) do
