@@ -16,7 +16,10 @@ climb the tower of Lot and discover what's at the top.
 
 ## Running with Vagrant ##
 
+If you want to run and develop locally, install [Chef-DK](https://downloads.chef.io/chef-dk/), which includes [Berkshelf](http://berkshelf.com/).
+
     $ vagrant plugin install vagrant-berkshelf
+    $ berks install
     $ vagrant up
 
 You should then be able to connect over localhost:9001.  Code changes should
@@ -72,4 +75,4 @@ connect player1 foobarbaz
 
 ## License ##
 
-MIT
+lol is released under the [MIT License](https://raw.github.com/ajduncan/lol/master/LICENSE)
