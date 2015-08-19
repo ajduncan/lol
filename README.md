@@ -14,9 +14,17 @@ storms that cover and uncover ruins of the last civilization.
 The goal of this short game is to reach the center of the world,
 climb the tower of Lot and discover what's at the top.
 
+## Running with Vagrant ##
+
+    $ vagrant plugin install vagrant-berkshelf
+    $ vagrant up
+
+You should then be able to connect over localhost:9001.  Code changes should
+cause rerun to restart the server.
+
 ## Installing ##
 
-    $ rvm use 2.1.2
+    $ rvm use 2.2.2
     $ gem install bundler
     $ bundle install
 
@@ -24,7 +32,13 @@ You must also run a migration to initialize the database.
 
 ## Migrations ##
 
+If using sqlite;
+
     $ sequel -m db/migrations sqlite://db/lol.db
+
+Otherwise;
+
+    $ sequel -m db/imgrations postgresql://user:pass@host/dbname
 
 ## Tests ##
 
@@ -40,9 +54,13 @@ To generate a self-signed private certificate to use an encrypted server;
 
 ## Running ##
 
-Start the server:
+Start the server with defaults:
 
     $ ./lol.rb
+
+Run with some environment variables:
+
+    $ DB_URI=postgresql://lol:foobarbaz@localhost/lol HOST=0.0.0.0 ./lol.rb
 
 Use the provided client, which will connect to localhost:9001 using ssl.
 
