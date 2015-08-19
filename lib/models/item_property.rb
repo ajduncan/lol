@@ -7,8 +7,8 @@ class ItemProperty < Sequel::Model
   set_schema do
     primary_key :id
     foreign_key :item_id, :items
-    string :key, :null=>false
-    string :value, :null=>false
+    String :key, :null=>false
+    String :value, :null=>false
     index [:item_id, :key], :unique=>true
   end
 end

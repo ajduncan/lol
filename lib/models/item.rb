@@ -16,8 +16,8 @@ class Item < Sequel::Model
   set_schema do
     primary_key :id
     integer :type, :null=>false, :default=>0
-    string :name, :null=>false
-    string :description
+    String :name, :null=>false
+    String :description
   end
 
   def validate

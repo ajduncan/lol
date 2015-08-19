@@ -23,8 +23,8 @@ class Agent < Sequel::Model
   set_schema do
     primary_key :id
     foreign_key :item_id, :items
-    string :name, :null=>false
-    string :description, :text=>true
+    String :name, :null=>false
+    String :description, :text=>true
   end
 
   attr_accessor :connection, :exits, :last_whisper

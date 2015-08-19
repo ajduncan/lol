@@ -19,7 +19,7 @@ class Link < Sequel::Model
     primary_key :id
     foreign_key :src_item_id, :items
     foreign_key :dst_item_id, :items
-    string :name, :null=>false
+    String :name, :null=>false
   end
 
   def validate

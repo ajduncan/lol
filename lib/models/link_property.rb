@@ -7,8 +7,8 @@ class LinkProperty < Sequel::Model
   set_schema do
     primary_key :id
     foreign_key :link_id, :links
-    string :key, :null=>false
-    string :value, :null=>false
+    String :key, :null=>false
+    String :value, :null=>false
     index [:link_id, :key], :unique=>true
   end
 end
