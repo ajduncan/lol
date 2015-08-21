@@ -30,7 +30,14 @@ kill the rerun process and use the following:
 
     $ vagrant ssh
     $ cd /vagrant
+
     $ /home/vagrant/.rbenv/versions/2.2.2/bin/rerun /home/vagrant/.rbenv/versions/2.2.2/bin/ruby /vagrant/lol.rb
+
+    or
+
+    $ rbenv exec gem install foreman
+    $ rbenv exec foreman start
+
 
 ## Installing ##
 
@@ -74,7 +81,9 @@ You may run with environment variables such as:
 
 Or copy the .env.example file to .env and edit the environment variables there,
 depending on the security of your environment and what convention you're most
-comfortable with.
+comfortable with.  Then the app will use these settings, or just use foreman:
+
+    $ foreman start
 
 Use the provided client, which will connect to localhost:9001 using ssl.
 
