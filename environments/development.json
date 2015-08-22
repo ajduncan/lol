@@ -5,5 +5,11 @@
     "description": "",
     "json_class": "Chef::Environment",
     "name": "development",
-    "override_attributes": {}
+    "override_attributes": {
+      "lol": {
+        "username": "vagrant",
+        "group": "vagrant",
+        "home": "/vagrant"
+      }
+    }
 }

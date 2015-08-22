@@ -12,10 +12,10 @@
   "rbenv": {
     "user_installs": [{
       "user": "vagrant",
-      "rubies": ["2.2.2"],
-      "global": "2.2.2",
+      "rubies": ["2.2.3"],
+      "global": "2.2.3",
       "gems": {
-        "2.2.2": [
+        "2.2.3": [
           {"name": "bundler"},
           {"name": "rake", "version": "10.4.2", "options": "--force" }
         ]
