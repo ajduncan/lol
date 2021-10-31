@@ -39,6 +39,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   abspath("chef.json.example")
                 end
     chef.json = JSON.parse(IO.read(json_file))
+    chef.arguments = "--chef-license accept"
     chef.environments_path = 'environments'
     chef.environment = 'development'
     chef.run_list = [
