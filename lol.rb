@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# coding: UTF-8
+# coding: UTF-8 :)
 
 require "dotenv"; Dotenv.load
 require "eventmachine"
