@@ -17,6 +17,6 @@ end
 group :test do
   gem 'factory_girl'
   gem 'fuubar'
-  gem 'rake'
+  gem 'rake', '>= 12.3.3'
   gem 'rspec'
 end
