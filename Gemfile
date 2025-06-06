@@ -15,7 +15,7 @@ group :development do
 end
 
 group :test do
-  gem 'factory_girl'
+  gem 'factory_girl', '>= 4.7.0'
   gem 'fuubar'
   gem 'rake'
   gem 'rspec'
